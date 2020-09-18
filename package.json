@@ -266,6 +266,10 @@
     "language-xml": "0.35.3",
     "language-yaml": "0.32.0"
   },
+  "devDependencies": {
+    "atom-jasmine3-test-runner": ">=5"
+  },
+  "atomTestRunner": "./vendor/jasmine3-runner",
   "private": true,
   "scripts": {
     "preinstall": "node -e 'process.exit(0)'",
