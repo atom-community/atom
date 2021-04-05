@@ -9,7 +9,7 @@ temp.track()
 module.exports = ({logFile, headless, testPaths, buildAtomEnvironment}) ->
   window[key] = value for key, value of require '../vendor/jasmine'
 
-  require 'jasmine-tagged'
+  require './node_modules/jasmine-tagged'
 
   # Rewrite global jasmine functions to have support for async tests.
   # This way packages can create async specs without having to import these from the
@@ -166,5 +166,5 @@ buildTerminalReporter = (logFile, resolveWithExitCode) ->
     {JasmineListReporter} = require './jasmine-list-reporter'
     new JasmineListReporter(options)
   else
-    {TerminalReporter} = require 'jasmine-tagged'
+    {TerminalReporter} = require './node_modules/jasmine-tagged'
     new TerminalReporter(options)

@@ -3,8 +3,8 @@ const FileRecoveryService = require('../../src/main-process/file-recovery-servic
 const fs = require('fs-plus');
 const fsreal = require('fs');
 const EventEmitter = require('events').EventEmitter;
-const { assert } = require('chai');
-const sinon = require('sinon');
+const { assert } = require('../node_modules/chai');
+const sinon = require('../node_modules/sinon');
 const { escapeRegExp } = require('underscore-plus');
 const temp = require('temp').track();
 

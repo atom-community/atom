@@ -1,0 +1,14 @@
+{
+  "name": "atom-tests",
+  "description": "Atom tests",
+  "dependencies": {
+    "chai": "4.2.0",
+    "jasmine-json": "~0.0",
+    "jasmine-reporters": "1.1.0",
+    "jasmine-tagged": "^1.1.4",
+    "mocha": "6.2.3",
+    "mocha-junit-reporter": "2.0.0",
+    "mocha-multi-reporters": "^1.1.4",
+    "sinon": "9.2.1"
+  }
+}

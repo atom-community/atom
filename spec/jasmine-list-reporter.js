@@ -1,4 +1,4 @@
-const { TerminalReporter } = require('jasmine-tagged');
+const { TerminalReporter } = require('./node_modules/jasmine-tagged');
 
 class JasmineListReporter extends TerminalReporter {
   fullDescription(spec) {

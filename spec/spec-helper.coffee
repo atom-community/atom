@@ -1,4 +1,4 @@
-require 'jasmine-json'
+require './node_modules/jasmine-json'
 require '../src/window'
 require '../vendor/jasmine-jquery'
 path = require 'path'

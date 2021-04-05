@@ -45,7 +45,12 @@ async function bootstrap() {
   await Thread.terminate(installApm)
 
   const runApmInstall = require('./lib/run-apm-install')
+
+  console.log('Installing dependencies:')
   runApmInstall(CONFIG.repositoryRootPath, ci)
+
+  console.log('Installing test dependencies:')
+  runApmInstall(path.join(CONFIG.repositoryRootPath, 'spec'), ci)
 
   await installScriptDependenciesPromise;
   await Thread.terminate(installScriptDependencies)

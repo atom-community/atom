@@ -5,7 +5,7 @@ const fs = require('fs-plus');
 const url = require('url');
 const { EventEmitter } = require('events');
 const temp = require('temp').track();
-const sandbox = require('sinon').createSandbox();
+const sandbox = require('../node_modules/sinon').createSandbox();
 const dedent = require('dedent');
 
 const AtomWindow = require('../../src/main-process/atom-window');

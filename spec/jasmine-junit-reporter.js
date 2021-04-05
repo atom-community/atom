@@ -1,4 +1,4 @@
-require('jasmine-reporters');
+require('./node_modules/jasmine-reporters');
 
 class JasmineJUnitReporter extends jasmine.JUnitXmlReporter {
   fullDescription(spec) {

@@ -1,6 +1,6 @@
-const Mocha = require('mocha');
+const Mocha = require('../node_modules/mocha');
 const fs = require('fs-plus');
-const { assert } = require('chai');
+const { assert } = require('../node_modules/chai');
 
 module.exports = function(testPaths) {
   global.assert = assert;

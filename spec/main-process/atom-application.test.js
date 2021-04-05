@@ -5,7 +5,7 @@ const { EventEmitter } = require('events');
 const temp = require('temp').track();
 const fs = require('fs-plus');
 const electron = require('electron');
-const sandbox = require('sinon').createSandbox();
+const sandbox = require('../node_modules/sinon').createSandbox();
 
 const AtomApplication = require('../../src/main-process/atom-application');
 const parseCommandLine = require('../../src/main-process/parse-command-line');
