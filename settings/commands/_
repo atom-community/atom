@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# the commands command but for lazy people
+./settings/commands/commands

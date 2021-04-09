@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# summary
+    # this only exists so that python for-sure 
+    # links to pip3 and not pip2
+
+pip3 $@

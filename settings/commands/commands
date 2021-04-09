@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo "project commands:"
+ls -1 --color ./settings/commands | sed 's/^/    /'

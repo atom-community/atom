@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+echo "What is the url to the mixin?"
+read url
+
+# remove any leftover ones (caused by git merge conflicts)
+git remote remove mixin &>/dev/null
+git remote add mixin "$url"
+git fetch mixin --tags
+git merge --allow-unrelated-histories mixin/master
+git remote remove mixin &>/dev/null

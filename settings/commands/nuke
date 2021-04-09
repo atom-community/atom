@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+# summary
+#   this is a nuclear cleaning option 
+#   - if its not part of the git repo
+#   - and it will take a long time (>1min) to get the data back
+#   => this command should get rid of it
+#   useful when you're trying to reset a project back to 0 when debugging
+
+read -p "Are you sure? (y/n)" -n 1 -r
+echo    # (optional) move to a new line
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "canceling"
+    exit 0
+fi
+
+# clean all the small things
+./settings/commands/clean
+
+# all the virtual env pip modules (several minutes to rebuild these)
+rm -rfv .venv

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# if its a file
+if [[ -f "$1" ]]; then
+    chmod ugo+x "$1" &>/dev/null || sudo chmod ugo+x "$1"
+fi
+
+# if its a directory
+if [[ -f "$1" ]]; then
+    chmod -R ugo+r "$1" &>/dev/null || sudo chmod -R ugo+x "$1"
+fi
+
+# fail if the file/directory doesnt exist
+if ! [[ -e "$1" ]]; then
+    return 0
+fi

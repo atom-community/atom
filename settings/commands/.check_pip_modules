@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+echo Running pip3 install check
+
+# ensure that the requirements.txt, and ./settings/.cache/.nosync.pip3_modules.hash files exits
+if ! [[ -f "./requirements.txt" ]]; then
+    pip3 freeze > requirements.txt
+fi
+if ! [[ -f "./settings/.cache/.nosync.pip3_modules.hash" ]]; then
+    # make sure the folder exists
+    mkdir -p ./settings/.cache/
+    touch "./settings/.cache/.nosync.pip3_modules.hash"
+fi
+
+# check if need to do pip3 install using that hash
+old_pip3_modules_hash="$(cat ./settings/.cache/.nosync.pip3_modules.hash)"
+new_pip3_modules_hash="$(cat requirements.txt | md5sum)"
+if [[ "$old_pip3_modules_hash" != "$new_pip3_modules_hash" ]]; then
+    # only save the hash if the install is successful
+    pip3 install -r requirements.txt && echo "$new_pip3_modules_hash" > "./settings/.cache/.nosync.pip3_modules.hash"
+else
+    echo "I see a cached pip3 check, so the pip3 install check seems to be good"
+fi

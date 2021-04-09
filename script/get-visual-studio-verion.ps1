@@ -1,0 +1,1 @@
+(vswhere -products * -find **/Hostx86/x86/* | select-string '(\\MSVC\\)(.*)(\\bin)').matches.groups[2].value

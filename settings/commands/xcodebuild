@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+# this is to patch through the command to node-gyp
+/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild

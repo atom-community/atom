@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# summary
+#   this just removes all of the can-be deleted files
+#   can be useful for fixing corrupted setups
+
+#!/usr/bin/env bash
+
+# summary
+#   this just removes all of the can-be deleted files like cache's
+#   devs should never have to worry about running the cleaning file
+#   
+#   this can be useful for fixing corrupted setups
+
+# the usual things
+rm -rfv ./settings/.cache **/*.cleanable **/*.cleanable.*
+
+# python cache at any level (half second to rebuild these)
+rm -rf **/__pycache__
+
+./script/clean

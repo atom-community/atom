@@ -11,7 +11,7 @@ if (process.argv.includes('--no-bootstrap')) {
   // are installed.
   const path = require('path')
   const childProcess = require('child_process')
-  childProcess.execFileSync(process.execPath, [path.join(CONFIG.scriptRootPath, 'bootstrap')], { env: process.env, cwd: CONFIG.repositoryRootPath, stdio: 'inherit' });
+  childProcess.execFileSync(process.execPath, [path.join(CONFIG.scriptRootPath, 'bootstrap')], { env: process.env, cwd: CONFIG.repositoryRootPath, stdio: 'inherit' })
 }
 
 // Required to load CS files in this build script, such as those in `donna`
@@ -20,6 +20,7 @@ require('colors')
 
 const path = require('path')
 const yargs = require('yargs')
+const { generatePackageJsonWithTracking } = require("version-tracker")
 const argv = yargs
   .usage('Usage: $0 [options]')
   .help('help')
@@ -62,6 +63,7 @@ process.on('unhandledRejection', function (e) {
   process.exit(1)
 })
 
+// Used by the 'github' package for Babel configuration
 process.env.ELECTRON_VERSION = CONFIG.appMetadata.electronVersion
 
 async function transpile() {
@@ -82,19 +84,19 @@ async function transpile() {
   const transpilePegJsPaths = await spawn(new Worker('./lib/transpile-peg-js-paths'))
   const transpilePegJsPathsPromise = transpilePegJsPaths()
 
-  await transpilePackagesWithCustomTranspilerPathsPromise;
+  await transpilePackagesWithCustomTranspilerPathsPromise
   await Thread.terminate(transpilePackagesWithCustomTranspilerPaths)
 
-  await transpileBabelPathsPromise;
+  await transpileBabelPathsPromise
   await Thread.terminate(transpileBabelPaths)
 
-  await transpileCoffeeScriptPathsPromise;
+  await transpileCoffeeScriptPathsPromise
   await Thread.terminate(transpileCoffeeScriptPaths)
 
-  await transpileCsonPathsPromise;
+  await transpileCsonPathsPromise
   await Thread.terminate(transpileCsonPaths)
 
-  await transpilePegJsPathsPromise;
+  await transpilePegJsPathsPromise
   await Thread.terminate(transpilePegJsPaths)
 }
 
@@ -188,8 +190,12 @@ async function build() {
         console.log('Skipping installation. Specify the --install option to install Atom'.gray)
       }
   }
-
+  
 }
 
 
-build().then(() => {process.exit(0)}).catch((e) =>  {throw e;})
+build().then(() => {
+  // record the versions of binaries that were used to create the successful build
+  generatePackageJsonWithTracking({indent: 2, source: "./package.json", log: "./version-log.json"})
+  process.exit(0)
+}).catch((e) => {throw e})

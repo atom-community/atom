@@ -165,6 +165,7 @@
     "tree-view": "https://www.atom.io/api/packages/tree-view/versions/0.228.2/tarball",
     "typescript-simple": "8.0.6",
     "update-package-dependencies": "file:./packages/update-package-dependencies",
+    "version-tracker": "2.0.0",
     "vscode-ripgrep": "1.9.0",
     "welcome": "file:packages/welcome",
     "whitespace": "https://www.atom.io/api/packages/whitespace/versions/0.37.7/tarball",
@@ -283,6 +284,154 @@
     "globals": [
       "atom",
       "snapshotResult"
+    ]
+  },
+  "versionTracker": {
+    "track": [
+      {
+        "name": "os",
+        "versionCommands": [
+          [
+            "node",
+            "--eval",
+            "console.log(os.platform(),os.release())"
+          ]
+        ]
+      },
+      {
+        "name": "node",
+        "versionCommands": [
+          [
+            "node",
+            "--version"
+          ]
+        ]
+      },
+      {
+        "name": "npm",
+        "versionCommands": [
+          [
+            "npm",
+            "-v"
+          ]
+        ]
+      },
+      {
+        "name": "xcode",
+        "versionCommands": [
+          [
+            "/usr/bin/xcodebuild",
+            "-version"
+          ]
+        ]
+      },
+      {
+        "name": "clang",
+        "versionCommands": [
+          [
+            "clang",
+            "--version"
+          ]
+        ]
+      },
+      {
+        "name": "visual studio",
+        "versionCommands": [
+          [
+            "powershell",
+            "./script/get-visual-studio-verion.ps1"
+          ],
+          [
+            "pwsh",
+            "./script/get-visual-studio-verion.ps1"
+          ]
+        ]
+      },
+      {
+        "name": "apm",
+        "versionCommands": [
+          [
+            "apm",
+            "-v"
+          ]
+        ]
+      },
+      {
+        "name": "powershell",
+        "versionCommands": [
+          [
+            "powershell",
+            "--version"
+          ],
+          [
+            "pwsh",
+            "--version"
+          ]
+        ]
+      },
+      {
+        "name": "python",
+        "versionCommands": [
+          [
+            "python",
+            "--version"
+          ]
+        ]
+      },
+      {
+        "name": "python2",
+        "versionCommands": [
+          [
+            "python2",
+            "--version"
+          ]
+        ]
+      },
+      {
+        "name": "python3",
+        "versionCommands": [
+          [
+            "python3",
+            "--version"
+          ]
+        ]
+      },
+      {
+        "name": "zsh",
+        "versionCommands": [
+          [
+            "zsh",
+            "--version"
+          ]
+        ]
+      },
+      {
+        "name": "bash",
+        "versionCommands": [
+          [
+            "bash",
+            "--version"
+          ]
+        ]
+      },
+      {
+        "name": "git",
+        "versionCommands": [
+          [
+            "git",
+            "--version"
+          ]
+        ]
+      },
+      {
+        "name": "make",
+        "versionCommands": [
+          [
+            "make",
+            "--version"
+          ]
+        ]
+      }
     ]
   }
 }
