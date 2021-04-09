@@ -1,0 +1,31 @@
+parameters:
+  # artifacts files or directory
+  # props:
+  # - path
+  # - condition
+  # - archiveFileName
+  # - archiveDir
+  - name: artifacts
+    type: object
+    default: {}
+
+steps:
+  - ${{ each artifact in parameters.artifacts }}:
+    - task: ArchiveFiles@2
+      inputs:
+        rootFolderOrFile: ${{artifact.path}}
+        archiveType: 7z
+        sevenZipCompression: normal
+        archiveFile: ${{artifact.archiveDir}}/${{artifact.archiveFileName}}
+        replaceExistingArchive: true
+      displayName: Compress ${{artifact.path}}
+      ${{ if artifact.condition }}:
+        condition: ${{artifact.condition}}
+
+    - template: ./publish.yml
+      parameters:
+        artifacts:
+          - filename: ${{artifact.archiveFileName}}
+            dir: ${{artifact.archiveDir}}
+            ${{ if artifact.condition }}:
+              condition: ${{artifact.condition}}

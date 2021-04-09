@@ -4,6 +4,7 @@ jobs:
     timeoutInMinutes: 180
     variables:
       ReleaseVersion: $[ dependencies.GetReleaseVersion.outputs['Version.ReleaseVersion'] ]
+      IsBuild: true
     pool:
       vmImage: ubuntu-16.04
 
