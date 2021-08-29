@@ -1,3 +1,12 @@
+
+
+# Main Links
+
+- [APM API Documentation](https://flight-manual.atom.io/atom-server-side-apis/)
+- [Contributing to packages](https://flight-manual.atom.io/hacking-atom/sections/contributing-to-official-atom-packages/)
+
+
+
 # Profiling the Atom Render Process on macOS with Instruments
 
 ![Instruments](https://cloud.githubusercontent.com/assets/1789/14193295/d503db7a-f760-11e5-88bf-fe417c0cd913.png)
