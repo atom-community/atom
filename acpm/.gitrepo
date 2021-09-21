@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/jeff-hykin/acpm
 	branch = master
-	commit = 2eaa38f15c06fc6bd070562c42840ce4b06fa29d
-	parent = 99de8383804386f3df1a193bece7cb7e231bbf99
+	commit = eb2e10fd49549dd56c3767292283b53b71363664
+	parent = c55f8d4e9ffa5cccbead082f04bb76567e0a5f42
 	method = merge
 	cmdver = 0.4.3
