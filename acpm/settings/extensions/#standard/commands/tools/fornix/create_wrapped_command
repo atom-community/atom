@@ -1,0 +1,144 @@
+#!/usr/bin/env bash
+
+# 
+# find fornix if needed
+# 
+if ! [ -d "$FORNIX_FOLDER" ]
+then
+    path_to_file=""
+    file_name="settings/fornix_core"
+    folder_to_look_in="$PWD"
+    while :
+    do
+        # check if file exists
+        if [ -f "$folder_to_look_in/$file_name" ]
+        then
+            path_to_file="$folder_to_look_in/$file_name"
+            break
+        else
+            if [ "$folder_to_look_in" = "/" ]
+            then
+                break
+            else
+                folder_to_look_in="$(dirname "$folder_to_look_in")"
+            fi
+        fi
+    done
+    if [ -z "$path_to_file" ]
+    then
+        #
+        # what to do if file never found
+        #
+        echo "Im a script (create_manual_command)"
+        echo "with a pwd of:$PWD"
+        echo "Im looking for settings/fornix_core in a parent folder"
+        echo "Im exiting now because I wasnt able to find it"
+        echo "thats all the information I have"
+        exit
+    fi
+    export FORNIX_FOLDER="$(dirname "$(dirname "$path_to_file")")"
+fi
+
+# 
+# ensure folder exists
+# 
+mkdir -p "$FORNIX_FOLDER/wrapped_commands"
+
+# 
+# start creating the command
+#
+name_of_executable="$1"
+escaped_name_of_executable="$(printf '%s' "'$(printf '%s' "$name_of_executable" | sed 's/'"'"'/'"'"'"'"'"'"'"'"'/g')'")"
+read -r -d '' __temp_var__part1 <<'HEREDOC_NAME'
+
+    # 
+    # if fornix isnt defined, then find it
+    # 
+    if [ -z "$FORNIX_FOLDER" ]
+    then
+        path_to_file=""
+        file_name="settings/fornix_core"
+        folder_to_look_in="$PWD"
+        while :
+        do
+            # check if file exists
+            if [ -f "$folder_to_look_in/$file_name" ]
+            then
+                path_to_file="$folder_to_look_in/$file_name"
+                break
+            else
+                if [ "$folder_to_look_in" = "/" ]
+                then
+                    break
+                else
+                    folder_to_look_in="$(dirname "$folder_to_look_in")"
+                fi
+            fi
+        done
+        if [ -z "$path_to_file" ]
+        then
+            #
+            # what to do if file never found
+            #
+            echo "Im a script running with a pwd of:$PWD"
+            echo "Im looking for settings/fornix_core in a parent folder"
+            echo "Im exiting now because I wasnt able to find it"
+            echo "thats all the information I have"
+            exit
+        fi
+        export FORNIX_NEXT_RUN_ONLY_DO_BASIC_INIT="true"
+        . "$path_to_file"
+    fi
+
+
+    #
+    # escape all arguments
+    #
+    args=""
+    # for each argument (in a argument-might-have-spaces friendly way)
+    for arg in "$@"; do
+        # this escapes single quotes
+        escaped_argument="$(printf '%s' "'$(printf '%s' "$arg" | sed 's/'"'"'/'"'"'"'"'"'"'"'"'/g')'")"
+        args="$args $escaped_argument"
+    done
+    
+HEREDOC_NAME
+
+__temp_var__part2="
+    name_of_executable=$escaped_name_of_executable
+"
+
+read -r -d '' __temp_var__part3 <<'HEREDOC_NAME'
+    
+    # might seem like this is being escaped twice, sadly its not
+    escaped_name_of_executable="$(printf '%s' "'$(printf '%s' "$name_of_executable" | sed 's/'"'"'/'"'"'"'"'"'"'"'"'/g')'")"
+    args="$escaped_name_of_executable $args"
+    # wrap all the args inside another arg (double escaping single quotes... yeah its gonna be 200% illegible)
+    zsh_arg="$(printf '%s' "'$(printf '%s' "$args" | sed 's/'"'"'/'"'"'"'"'"'"'"'"'/g')'")"
+    
+    #
+    # run the command, inside nix-shell, inside zsh
+    #
+    HOME="$FORNIX_HOME" nix-shell --pure --run "zsh -c $zsh_arg" "$FORNIX_FOLDER/settings/requirements/shell.nix"
+HEREDOC_NAME
+
+# 
+# create the command
+# 
+mkdir -p "$FORNIX_FOLDER/wrapped_commands"
+echo "#!/usr/bin/env bash
+    $__temp_var__part1
+    $__temp_var__part2
+    $__temp_var__part3
+" > "$FORNIX_FOLDER/wrapped_commands/$name_of_executable"
+# make it executable
+chmod ugo+x "$FORNIX_FOLDER/wrapped_commands/$name_of_executable" &>/dev/null || sudo chmod ugo+x "$FORNIX_FOLDER/wrapped_commands/$name_of_executable"
+
+echo "command created: ./wrapped_commands/$name_of_executable"
+echo "make sure to run the following at least once per session:"
+__fornix_folder_escaped="$(printf '%s' "'$(printf '%s' "$FORNIX_FOLDER" | sed 's/'"'"'/'"'"'"'"'"'"'"'"'/')'")"
+echo "    export PATH=$__fornix_folder_escaped\"/wrapped_commands:\$PATH\""
+
+unset __temp_var__part1
+unset __temp_var__part2
+unset __temp_var__part3

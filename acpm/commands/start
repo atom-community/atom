@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+# 
+# summary
+# 
+#     with no arguments, this simply starts the shell
+#     with an argument, it refreshes the project connections, then runs `$commands_folder/project/$the_arguments`
+
+# 
+# find the fornix_core
+# 
+path_to_fornix_core=""
+file_name="settings/fornix_core"
+folder_to_look_in="$PWD"
+while :
+do
+    # check if file exists
+    if [ -f "$folder_to_look_in/$file_name" ]
+    then
+        path_to_fornix_core="$folder_to_look_in/$file_name"
+        break
+    else
+        if [ "$folder_to_look_in" = "/" ]
+        then
+            break
+        else
+            folder_to_look_in="$(dirname "$folder_to_look_in")"
+        fi
+    fi
+done
+if [ -z "$path_to_fornix_core" ]
+then
+    #
+    # what to do if file never found
+    #
+    echo "Im a script running with a pwd of:$PWD"
+    echo "Im looking for settings/fornix_core in a parent folder"
+    echo "Im exiting now because I wasnt able to find it"
+    echo "thats all the information I have"
+    exit
+fi
+export FORNIX_NEXT_RUN_DONT_DO_MANUAL_START="true"
+. "$path_to_fornix_core"
+
+if [ "$FORNIX_DEBUG" = "true" ]; then
+    echo "starting: $FORNIX_COMMANDS_FOLDER"start
+fi
+# just start the shell with no arguments (arguments might be supported in the future)
+"$FORNIX_COMMANDS_FOLDER/shell"
+if [ "$FORNIX_DEBUG" = "true" ]; then
+    echo "finished: $FORNIX_COMMANDS_FOLDER"start
+fi

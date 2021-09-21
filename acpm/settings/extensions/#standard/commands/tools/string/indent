@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+__temp_var__indent="$2"
+if [ "$#" = "1" ]
+then
+    __temp_var__indent=" {1,4}"
+fi
+
+printf '%s' "$1" sed 's/^/'"$__temp_var__indent"'/g'
+unset __temp_var__indent

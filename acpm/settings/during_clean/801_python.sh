@@ -1,0 +1,1 @@
+../extensions/python/during_clean.sh

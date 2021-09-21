@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+function escape_grep_regex() {
+    sed 's/[][\.|$(){}?+*^]/\\&/g' <<< "$*"
+}
+
+function add_to_gitignore {
+    if [[ -z "$FORNIX_FOLDER" ]]
+    then
+        path_to_file=""
+        file_name="settings/fornix_core"
+        folder_to_look_in="$PWD"
+        while :
+        do
+            # check if file exists
+            if [ -f "$folder_to_look_in/$file_name" ]
+            then
+                path_to_file="$folder_to_look_in/$file_name"
+                break
+            else
+                if [ "$folder_to_look_in" = "/" ]
+                then
+                    break
+                else
+                    folder_to_look_in="$(dirname "$folder_to_look_in")"
+                fi
+            fi
+        done
+        if [ -z "$path_to_file" ]
+        then
+            #
+            # what to do if file never found
+            #
+            echo "Im a script running with a pwd of:$PWD"
+            echo "Im looking for settings/fornix_core in a parent folder"
+            echo "Im exiting now because I wasnt able to find it"
+            echo "thats all the information I have"
+            exit
+        fi
+        FORNIX_FOLDER="$(realpath "$path_to_file/../..")"
+    fi
+    local ignore_file="$FORNIX_FOLDER/.gitignore"
+    # check if file exists
+    if ! [[ -f ".gitignore" ]]
+    then
+        if [[ -d ".git" ]]
+        then
+            # fallback to the exclude file
+            ignore_file="$FORNIX_FOLDER/.git/info/exclude"
+        fi
+    fi
+    mkdir -p "$(dirname "$ignore_file")"
+    touch "$ignore_file"
+    
+    local argument_was_added="false"
+    local added_at_least_one_thing="true"
+    for arg in "$@"
+    do
+        local path_to_ignore="$(realpath "$arg" --relative-to="$FORNIX_FOLDER" --canonicalize-missing --no-symlinks)"
+        local escaped_name="$(escape_grep_regex "$path_to_ignore")"
+        # if it wasn't in the ignore already
+        grep -E -- "$escaped_name$" "$ignore_file" &>/dev/null || {
+            # if this is the first one that wasn't in the git ignore
+            if [[ "$argument_was_added" = "false" ]]
+            then
+                argument_was_added="true"
+                printf "\n# these lines were auto-added and may be very important (passwords/auth etc)\n" >> "$ignore_file"
+                printf "# comment it out if you know what you're doing and dont want it to be ignored\n" >> "$ignore_file"
+                printf "# [start auto-ignore]\n" >> "$ignore_file"
+            fi
+            argument_was_added="true"
+            printf "$path_to_ignore\n" >> "$ignore_file"
+        }
+        
+    done
+    # if an argument was added, add a concluding comment
+    if [[ "$argument_was_added" = "true" ]]
+    then
+        printf "# [end auto-ignore]\n" >> "$ignore_file"
+    fi
+}
+add_to_gitignore "$@"

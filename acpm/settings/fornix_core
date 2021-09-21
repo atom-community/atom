@@ -1,0 +1,132 @@
+# 
+# NOTE: I wouldn't recommend adding new variables (or anything) here
+# 
+# (but the existing vars can be changed, and you can add custom logic with settings/extensions/YOUR_THING/#establish_extension.sh)
+
+# change the "false" to "true" to see how everything works!
+export FORNIX_DEBUG="false"
+
+#
+# helper function
+#
+__fornix_debug_message () { if [ "$FORNIX_DEBUG" = "true" ]; then echo "$@"; fi }
+__fornix_debug_message "starting: settings/fornix_core"
+
+# 
+# find this file 
+# 
+__fornix_debug_message "    looking for settings/fornix_core (yes, I'm trying to find myself)"
+path_to_file=""
+file_name="settings/fornix_core"
+folder_to_look_in="$PWD"
+while :
+do
+    # check if file exists
+    if [ -f "$folder_to_look_in/$file_name" ]
+    then
+        path_to_file="$folder_to_look_in/$file_name"
+        break
+    else
+        if [ "$folder_to_look_in" = "/" ]
+        then
+            break
+        else
+            folder_to_look_in="$(dirname "$folder_to_look_in")"
+        fi
+    fi
+done
+if [ -z "$path_to_file" ]
+then
+    #
+    # what to do if file never found
+    #
+    echo "Im a script running with a pwd of:$PWD"
+    echo "Im looking for settings/fornix_core in a parent folder"
+    echo "Im exiting now because I wasnt able to find it"
+    echo "thats all the information I have"
+    exit
+fi
+__fornix_debug_message "    I found myself"
+
+# 
+# set main vars
+# 
+__fornix_debug_message "    Establishing (possibly re-establishing) the three core env variables"
+export FORNIX_FOLDER="$(dirname "$(dirname "$path_to_file")")"
+export FORNIX_HOME="$FORNIX_FOLDER/settings/home/"
+export FORNIX_COMMANDS_FOLDER="$FORNIX_FOLDER/commands/"
+__fornix_debug_message "        FORNIX_FOLDER:          '$FORNIX_FOLDER'"
+__fornix_debug_message "        FORNIX_HOME:            '$FORNIX_HOME'"
+__fornix_debug_message "        FORNIX_COMMANDS_FOLDER: '$FORNIX_COMMANDS_FOLDER'"
+
+# 
+# run the refresh for each of the extensions (if the flag it not set)
+# 
+if ! [ "$FORNIX_NEXT_RUN_ONLY_DO_BASIC_INIT" = "true" ]
+then
+    __fornix_debug_message "    Becase FORNIX_NEXT_RUN_ONLY_DO_BASIC_INIT != 'true'"
+    __fornix_debug_message "    I'm going to run each of the #establish_extension.sh files for every folder inside settings/extensions/"
+    # 
+    # check that realpath exists and works
+    # 
+    __temp_var__realpath_works=""
+    # if realpath exists
+    if [ -n "$(command -v "realpath")" ]
+    then
+        __temp_var__test_output="$(realpath "/Blah/blahBlahBlah/aFolder/fornix/settings/extensions/#standard" --relative-to="/Blah/blahBlahBlah/aFolder/fornix/commands//tools" --canonicalize-missing)"
+        if [ "$__temp_var__test_output" = '../../settings/extensions/#standard' ]
+        then
+            __temp_var__realpath_works="true"
+        fi
+        unset __temp_var__test_output
+    fi
+    # 
+    # run all the #establish_extension.sh files
+    # 
+    if [ "$__temp_var__realpath_works" = "true" ]
+    then
+        # this loop is so stupidly complicated because of many inherent-to-shell reasons, for example: https://stackoverflow.com/questions/13726764/while-loop-subshell-dilemma-in-bash
+        for_each_item_in="$FORNIX_FOLDER/settings/extensions/"; [ -z "$__NESTED_WHILE_COUNTER" ] && __NESTED_WHILE_COUNTER=0;__NESTED_WHILE_COUNTER="$((__NESTED_WHILE_COUNTER + 1))"; trap 'rm -rf "$__temp_var__temp_folder"' EXIT; __temp_var__temp_folder="$(mktemp -d)"; mkfifo "$__temp_var__temp_folder/pipe_for_while_$__NESTED_WHILE_COUNTER"; (find "$for_each_item_in" -maxdepth 1 ! -path . -print0 2>/dev/null | sort -z > "$__temp_var__temp_folder/pipe_for_while_$__NESTED_WHILE_COUNTER" &); while read -d $'\0' each
+        do
+            __temp_var__file_path="$each/#establish_extension.sh"
+            # check if file exists
+            if [ -f "$__temp_var__file_path" ]
+            then
+                __fornix_debug_message "        loading: $__temp_var__file_path"
+                # tell the scripts what file they're inside of
+                export __THIS_FORNIX_EXTENSION_FILEPATH__="$__temp_var__file_path"
+                export __THIS_FORNIX_EXTENSION_FOLDERPATH__="$each"
+                . "$__temp_var__file_path"
+            fi
+            unset __temp_var__file_path
+        done < "$__temp_var__temp_folder/pipe_for_while_$__NESTED_WHILE_COUNTER";__NESTED_WHILE_COUNTER="$((__NESTED_WHILE_COUNTER - 1))"
+    else
+        echo 'Warning: skipping establish_extension'
+        echo '    It looks like either you dont have a `realpath` command or the realpath'
+        echo '    you do have doesnt support --relative-to= and/or --canonicalize-missing'
+        echo '    this `'"$(which realpath)"'` is what I get after running `which realpath`'
+        echo "    because realpath isn't working, I will be skipping the establish_extension/ "
+    fi
+    unset __temp_var__realpath_works
+    __fornix_debug_message "    Finished running the #establish_extension.sh in every folder inside settings/extensions/"
+    
+    # 
+    # run manual setup by default
+    # 
+    if ! [ "$FORNIX_NEXT_RUN_DONT_DO_MANUAL_START" = "true" ]
+    then
+        __fornix_debug_message "    Becase FORNIX_NEXT_RUN_DONT_DO_MANUAL_START != 'true'"
+        __fornix_debug_message "    I'm going to run all the settings/during_manual_start/ files"
+        # 
+        # find and run all the manual setup scripts in alphabetical order
+        #
+        . "$FORNIX_FOLDER/settings/extensions/#standard/commands/tools/fornix/trigger" "$FORNIX_FOLDER/settings/during_manual_start"
+    fi
+else
+    __fornix_debug_message "    Becase FORNIX_NEXT_RUN_ONLY_DO_BASIC_INIT = 'true', I'm done"
+fi
+# reset flags
+export FORNIX_NEXT_RUN_ONLY_DO_BASIC_INIT=""
+export FORNIX_NEXT_RUN_DONT_DO_MANUAL_START=""
+unset __temp_var__should_run_during_manual_start
+__fornix_debug_message "finished: settings/fornix_core"

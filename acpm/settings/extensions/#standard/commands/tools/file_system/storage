@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+if [[ "$1" = "." ]]
+then
+    du -sh "./"*
+    GLOBIGNORE=".:.." du -sh "./."*
+else
+    if [[ -d "$1" ]]
+    then
+        du -sh "$1"
+    elif [[ -f "$1" ]] 
+    then
+        ls -lh "$1"
+    else
+        echo "total remaining storage:"
+        df -h /
+    fi
+fi

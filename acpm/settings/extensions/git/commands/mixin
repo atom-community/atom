@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+git_mixin () {
+    url="$1"
+    branch="$2"
+    commit="$3"
+    
+    if [[ -z "$url" ]]
+    then    
+        echo "What is the url to the mixin?"
+        read url
+    fi
+    
+    if [[ -z "$branch" ]]
+    then    
+        echo "What is the branch you want to mixin? (default=master)"
+        read branch
+        if [[ -z "$branch" ]]
+        then
+            branch="master"
+        fi
+    fi
+    
+    # remove any leftover ones (caused by git merge conflicts)
+    git remote remove "@__temp__" &>/dev/null
+    git remote add "@__temp__" "$url"
+    git fetch "@__temp__" "$branch"
+    # if there was a commit
+    if ! [[ -z "$commit" ]]
+    then    
+        # only merge that one commit
+        git cherry-pick "$commit"
+    else
+        # merge the entire history
+        git pull --allow-unrelated-histories "@__temp__" "$branch"
+    fi
+    git submodule update --init --recursive
+    git remote remove "@__temp__" &>/dev/null
+}
+git_mixin "$@"

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+remove_spaces_from_names () {
+    folder="$1"
+    if [ -z "$folder" ]
+    then
+        echo "Please give a folder/file path" 1>&2
+    fi
+
+    replacement="$2"
+    if [ -z "$replacement" ]
+    then
+        replacement="_"
+    fi
+    
+    if ! [ -e "$folder" ]
+    then
+        echo "please give remove_spaces_from_names a valid file/folder path" 1>&2
+        echo "'$folder' is neither" 1>&2
+    else
+        # do the top-level first
+        each="$folder"
+        each_without_spaces="$(echo "$each" | sed 's/ /'"$replacement"'/g')"
+        # if it has spaces
+        if ! [ "$each_without_spaces" = "$each" ]
+        then
+            # rename it
+            mv "$each" "$each_without_spaces"
+        fi
+        
+        # do inner next (recursively)
+        if [ -d "$folder" ]
+        then
+            # this loop is so stupidly complicated because of many inherent-to-shell reasons, for example: https://stackoverflow.com/questions/13726764/while-loop-subshell-dilemma-in-bash
+            for_each_item_in="$folder"; [ -z "$__NESTED_WHILE_COUNTER" ] && __NESTED_WHILE_COUNTER=0;__NESTED_WHILE_COUNTER="$((__NESTED_WHILE_COUNTER + 1))"; trap 'rm -rf "$__temp_var__temp_folder"' EXIT; __temp_var__temp_folder="$(mktemp -d)"; mkfifo "$__temp_var__temp_folder/pipe_for_while_$__NESTED_WHILE_COUNTER"; (find "$for_each_item_in" -maxdepth 1 ! -path "$for_each_item_in" -print0 2>/dev/null | sort -z > "$__temp_var__temp_folder/pipe_for_while_$__NESTED_WHILE_COUNTER" &); while read -d $'\0' each
+            do
+                remove_spaces_from_names "$each" "$replacement"
+            done < "$__temp_var__temp_folder/pipe_for_while_$__NESTED_WHILE_COUNTER";__NESTED_WHILE_COUNTER="$((__NESTED_WHILE_COUNTER - 1))"
+        fi
+    fi
+}
+remove_spaces_from_names "$1" "$2"

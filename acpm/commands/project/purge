@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# summary
+#   this is a nuclear cleaning option 
+#   - if its not part of the git repo
+#   - and it will take a long time (>1min) to get the data back
+#   => this command should get rid of it
+#   useful when you're trying to reset a project back to 0 when debugging
+
+# if you want to add something
+#     edit the settings/during_purge/ 
+#     (add your own file to that folder like 001_clean_mything.sh)
+
+# get user confirmation
+read -p "Are you sure? (y/n)" -n 1 -r
+echo    # (optional) move to a new line
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "canceling"
+    exit 0
+fi
+
+# clean all the small things first
+"$FORNIX_COMMANDS_FOLDER/project/clean"
+
+# source all the file in settings/during_purge/ in alphabetical order
+. "$FORNIX_FOLDER/settings/extensions/#standard/commands/tools/fornix/trigger" "$FORNIX_FOLDER/settings/during_purge"

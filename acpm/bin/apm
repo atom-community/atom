@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+
+set -e
+
+initialCwd=`pwd -P`
+scriptDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+apmPath=$0
+builtin cd "`dirname "$apmPath"`"
+binDir=`basename "$apmPath"`
+
+# Detect node binary name
+osName=`uname -s`
+if [ "${osName:0:10}" == 'MINGW32_NT' ]; then
+  nodeBin="node.exe"
+elif [[ $(uname -r) == *-Microsoft ]]; then
+  nodeBin="node.exe"
+else
+  nodeBin="node"
+fi
+
+while [ -L "$binDir" ]
+do
+  binDir=`readlink "$binDir"`
+  builtin cd "`dirname "$binDir"`"
+  binDir=`basename "$binDir"`
+done
+
+binDir=`pwd -P`
+
+# Force npm to use its builtin node-gyp
+unset npm_config_node_gyp
+
+cliPath="$binDir/../lib/cli.js"
+if [[ $(uname -r) == *-Microsoft ]]; then
+  cliPath="$(echo $cliPath | sed 's/\/mnt\/\([a-z]*\)\(.*\)/\1:\2/')"
+  cliPath="${cliPath////\\}"
+else
+  builtin cd "$initialCwd"
+fi
+
+"$binDir/$nodeBin" "$cliPath" "$@"

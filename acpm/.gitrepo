@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/git-commands/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/jeff-hykin/acpm
+	branch = master
+	commit = bbedc64fc60032908f9220dabe79263468ff2019
+	parent = 023565013f47a115e2dbf77dcc0b6f1a5549d0b5
+	method = merge
+	cmdver = 0.4.3

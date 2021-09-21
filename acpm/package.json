@@ -1,0 +1,63 @@
+{
+    "name": "papm",
+    "description": "Performant Atom Package Manager",
+    "version": "0.0.0",
+    "license": "MIT",
+    "author": "Amin Yahyaabadi",
+    "repository": "https://github.com/atom-community/papm",
+    "main": "./lib/apm.js",
+    "bin": {
+        "apm": "bin/apm"
+    },
+    "scripts": {
+        "format": "prettier --write .",
+        "test.format": "prettier . --check",
+        "lint": "eslint . --fix",
+        "test.lint": "eslint .",
+        "check-version": "node script/check-version.js",
+        "clean.bin": "shx rm -rf bin/node_darwin_x64 bin/node.exe bin/node",
+        "prepare": "true",
+        "postinstall": "node ./script/download-node.js && shx chmod +x ./bin/pnpm && shx chmod +x ./bin/apm",
+        "get.fixtures": "node ./script/get-fixtures.js && shx cp -r ./spec/fixtures/r.tmbundle-patch/Snippets/ ./spec/fixtures/r.tmbundle/",
+        "test": "pnpm run check-version && jasmine-focused --captureExceptions spec",
+        "build": "true",
+        "build.test": "pnpm run get.fixtures"
+    },
+    "dependencies": {
+        "@aminya/underscore-plus": "^1.9.0",
+        "@atom/plist": "0.4.4",
+        "asar-require": "0.3.0",
+        "async": "^3.2.0",
+        "colors": "~1.4.0",
+        "first-mate": "^7.4.3",
+        "fysh": "^0.2.3",
+        "git-utils": "^5.7.3",
+        "glob": "^7.1.7",
+        "hosted-git-info": "^3.0.8",
+        "keytar": "^7.7.0",
+        "ncp": "~2.0.0",
+        "npm": "^6.14.13",
+        "open": "7.4.2",
+        "q": "~1.5.1",
+        "read": "~1.0.7",
+        "request": "^2.88.2",
+        "rimraf": "^3.0.2",
+        "season": "^6.0.2",
+        "semver": "^7.3.5",
+        "tar": "^6.1.0",
+        "temp": "^0.9.4",
+        "wordwrap": "1.0.0",
+        "yargs": "^3.32.0"
+    },
+    "devDependencies": {
+        "eslint-config-atomic": "^1.16.2",
+        "express": "^4.17.1",
+        "gitly": "^2.1.2",
+        "jasmine-focused": ">=1.0.7 <2.0",
+        "node-downloader-helper": "^1.0.18",
+        "node-gyp": "^8.0.0",
+        "prettier-config-atomic": "^2.1.0",
+        "shx": "^0.3.3"
+    },
+    "prettier": "prettier-config-atomic"
+}

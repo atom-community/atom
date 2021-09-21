@@ -1,0 +1,101 @@
+#! /usr/bin/env nix-shell
+#! nix-shell -i bash -p bash_5 -I nixpkgs=https://github.com/NixOS/nixpkgs/archive/046f8835dcb9082beb75bb471c28c832e1b067b6.tar.gz
+
+# the comments above^ are special
+#   they tell the system to process this using nix-shell
+#   specifically using the exact version of bash to use
+
+# summary
+#     with no arguments, this simply starts an interactive shell
+#     with an argument
+#         it starts the shell
+#         runs the arguments as if they were a command+arguments
+#         then exits the shell
+
+# 
+# find the fornix_core
+# 
+if [ -z "$FORNIX_FOLDER" ]
+then
+    path_to_fornix_core=""
+    file_name="settings/fornix_core"
+    folder_to_look_in="$PWD"
+    while :
+    do
+        # check if file exists
+        if [ -f "$folder_to_look_in/$file_name" ]
+        then
+            path_to_fornix_core="$folder_to_look_in/$file_name"
+            break
+        else
+            if [ "$folder_to_look_in" = "/" ]
+            then
+                break
+            else
+                folder_to_look_in="$(dirname "$folder_to_look_in")"
+            fi
+        fi
+    done
+    if [ -z "$path_to_fornix_core" ]
+    then
+        #
+        # what to do if file never found
+        #
+        echo "Im a script running with a pwd of:$PWD"
+        echo "Im looking for settings/fornix_core in a parent folder"
+        echo "Im exiting now because I wasnt able to find it"
+        echo "thats all the information I have"
+        exit
+    fi
+    export FORNIX_NEXT_RUN_DONT_DO_MANUAL_START="true"
+    . "$path_to_fornix_core"
+fi
+if [ "$FORNIX_DEBUG" = "true" ]; then
+    echo "starting: $FORNIX_COMMANDS_FOLDER"shell
+fi
+
+# if no arguments (just starting the shell) give the welcome message
+export FORNIX_ARGS="$@"
+
+#
+# find and run all the startup scripts in alphabetical order
+#
+
+# source all the file in settings/during_clean/ in alphabetical order
+. "$FORNIX_FOLDER/settings/extensions/#standard/commands/tools/fornix/trigger" "$FORNIX_FOLDER/settings/during_start_prep"
+
+# create a dummy home folder to prevent any problems when starting up
+__temp_var__cache_folder="$FORNIX_FOLDER/settings/.cache"
+__temp_home="$__temp_var__cache_folder/home/"
+rm -rf "$__temp_home" > /dev/null
+mkdir -p "$__temp_home/.cache/"
+# connect the nix cache to prevent duplicates
+# check if file exists
+if ! [ -d "$__temp_home/.cache/nix" ]
+then
+    ln -s "$HOME/.cache/nix" "$__temp_home/.cache/nix" 
+fi
+
+# if there are arguments, treat it as a run command
+if [ "$FORNIX_DEBUG" = "true" ]; then
+    echo "switching from Bash to Zsh"
+    echo "changing HOME to temp folder for nix-shell"
+fi
+__temp_var__nix_shell_file="$FORNIX_FOLDER/settings/extensions/nix/shell.nix"
+if [[ -n "$FORNIX_ARGS" ]]
+then
+    # FIXME: I think the single quotes need to be escaped from the arguments (need to iterate over them, escape each one with single quotes)
+    # run single command
+    HOME="$__temp_home" nix-shell --pure --run "zsh -c '$FORNIX_ARGS'" "$__temp_var__nix_shell_file"
+else
+    HOME="$__temp_home" nix-shell --pure --command "zsh" "$__temp_var__nix_shell_file"
+fi
+if [ "$FORNIX_DEBUG" = "true" ]; then
+    echo "exited the nix-shell environment"
+    echo "(Tools/Commands mentioned in 'settings/extensions/nix/nix.toml' are no longer available/installed)"
+    echo ""
+    echo "switched from Zsh back to Bash"
+    echo "finished: $FORNIX_COMMANDS_FOLDER"shell
+fi
+unset __temp_var__nix_shell_file
+unset __temp_var__cache_folder

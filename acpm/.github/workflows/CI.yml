@@ -1,0 +1,84 @@
+name: CI
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  Test:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+        node_version:
+          - 12
+          - 14
+        node_arch:
+          - x64
+        include:
+          - os: windows-latest
+            node_version: 12
+            node_arch: x64
+          - os: windows-2016
+            node_version: 12
+            node_arch: x86
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./node_modules/
+            ~/npm-cache
+            ~/.pnpm-store
+            D:\.pnpm-store
+            ./bin/node
+            ./bin/node.exe
+          key: "cache-OS:${{ matrix.os }}-${{ matrix.node_arch }}-node:${{ matrix.node_version }}-${{ hashFiles('./package.json') }}-${{ hashFiles('./.npmrc') }}"
+
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+          architecture: ${{ matrix.node_arch }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: pnpm install
+
+      - name: Build
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: pnpm run prepare
+
+      - name: Run tests
+        run: ./bin/pnpm test
+
+  Lint:
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Commit lint ✨
+        uses: wagoid/commitlint-github-action@v4
+
+      - name: Install dependencies
+        run: |
+          pnpm install --ignore-scripts # native modules are not used here
+          pnpm run prepare
+
+      - name: Format ✨
+        run: pnpm run test.format
+
+      - name: Lint ✨
+        run: pnpm run test.lint

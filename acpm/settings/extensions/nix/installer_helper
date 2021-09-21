@@ -1,0 +1,45 @@
+: 'have to use the : (the do-nothing command) for comments because this script gets crushed into one line';
+:       ;
+: MacOS ;
+:       ;
+if [[ "$OSTYPE" = "darwin"* ]]; then
+    full_version="$(sw_vers -productVersion)";
+    major_version="$(echo "$full_version" | sed -E 's/([0-9]+)\.[0-9]+\.[0-9]+/\1/g')";
+    minor_version="$(echo "$full_version" | sed -E 's/[0-9]+\.([0-9]+)\.[0-9]+/\1/g')";
+    :                 ; 
+    : Big Sur or Newer;
+    :                 ;
+    if [ "$major_version" = "11" ]; then
+        sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
+    elif [ "$major_version" -eq "10" ]; then
+        : Catalina ;
+        if [ "$minor_version" = "15" ]; then
+            sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume;
+        : 'Mojave, High Siera, Siera, and maybe older versions (Yosemite, Mavericks)' ;
+        else
+            curl -L https://nixos.org/nix/install | sh -s -- --daemon;
+        fi
+    else
+        echo 'We tried to get you MacOS version by running `sw_vers -productVersion`';
+        echo '(which returns '"$full_version"')';
+        echo "Either 1. that value is empty 2. You're on an insanely old version 3. You're on a version way way in the future from when this script was made";
+    fi
+fi
+
+:       ;
+: Linux ;
+:       ;
+if [ "$OSTYPE" = "linux-gnu" ]; then
+    curl -L https://nixos.org/nix/install | sh -s -- --daemon;
+fi
+
+: manually update the environment ;
+if [ -f "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh" ]; then
+    . "/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh";
+fi
+if [ -f "/Users/$(whoami)/.nix-profile/etc/profile.d/nix.sh" ]; then
+    . "/Users/$(whoami)/.nix-profile/etc/profile.d/nix.sh"
+fi
+export PATH="$PATH:/nix/var/nix/profiles/default/bin/";
+echo "If you want additional information about installing nix see: https://nixos.org/manual/nix/stable/#chap-installation";
+echo ""

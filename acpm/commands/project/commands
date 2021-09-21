@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+    echo "commands:"
+    echo "    project"
+    tree "$FORNIX_COMMANDS_FOLDER/project" -C --dirsfirst -A -F --noreport | sed 's/^/        /' | sed -E 's/(\*|@)$/ /' | sed "1d"
+    echo 
+    node -e 'try { Object.keys(require(process.env.FORNIX_FOLDER+"/package.json").scripts).forEach(each=>console.log(`    pnpm run ${each}`))}catch(e){}'
+    echo 
+    echo "examples:"
+    echo "    project clean"
+    echo "    project commands"
+    echo "    pnpm run test"
+    

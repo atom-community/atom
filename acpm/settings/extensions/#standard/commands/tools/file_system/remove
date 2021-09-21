@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+function escape_sed_regex() {
+    sed 's/[][\.|$(){}?+*^]/\\&/g' <<< "$*" | sed 's|/|\\/|g'
+}
+
+if [ -f "$1" ]
+then
+    rm -fv "$1" | sed -e 's/^removed (directory )?'"'$(escape_sed_regex "$FORNIX_FOLDER")"'/removed ./'
+else
+    rm -rfv "$1" | sed 's/^removed (directory )?'"'$(escape_sed_regex "$FORNIX_FOLDER")"'/removed ./'
+fi

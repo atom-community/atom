@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# get the folder argument
+which_folder="$1"
+shift 1
+
+# eat up all the args before -- for forward compatibility
+# for each argument (in a argument-might-have-spaces friendly way)
+for arg in "$@"; do
+    shift 1
+    if [ "$arg" = "--" ]
+    then
+        break
+    fi
+done
+
+# 
+# find and run all the startup scripts in alphabetical order
+#
+# this loop is so stupidly complicated because of many inherent-to-shell reasons, for example: https://stackoverflow.com/questions/13726764/while-loop-subshell-dilemma-in-bash
+if [ "$FORNIX_DEBUG" = "true" ]; then
+    echo "triggering: $(basename "$which_folder")"
+fi
+mkdir -p "$which_folder"
+for_each_item_in="$which_folder"
+[ -z "$__NESTED_WHILE_COUNTER" ] && __NESTED_WHILE_COUNTER=0;__NESTED_WHILE_COUNTER="$((__NESTED_WHILE_COUNTER + 1))"; trap 'rm -rf "$__temp_var__temp_folder"' EXIT; __temp_var__temp_folder="$(mktemp -d)"; mkfifo "$__temp_var__temp_folder/pipe_for_while_$__NESTED_WHILE_COUNTER"; (find -L "$for_each_item_in" ! -path . -print0 2>/dev/null | sort -z > "$__temp_var__temp_folder/pipe_for_while_$__NESTED_WHILE_COUNTER" &); while read -d $'\0' each
+do
+    # check if file exists
+    if [ -f "$each" ]
+    then
+        if [ "$FORNIX_DEBUG" = "true" ]
+        then
+            echo "    loading: $each"
+        fi
+        . "$each" "$@"
+    fi
+done < "$__temp_var__temp_folder/pipe_for_while_$__NESTED_WHILE_COUNTER";__NESTED_WHILE_COUNTER="$((__NESTED_WHILE_COUNTER - 1))"
+if [ "$FORNIX_DEBUG" = "true" ]; then
+    echo "finished triggering: $(basename "$which_folder")"
+fi

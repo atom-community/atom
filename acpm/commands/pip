@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+# summary
+    # this only exists so that pip for-sure corrisponds to the python command
+
+python -m pip --disable-pip-version-check "$@"

@@ -1,0 +1,1 @@
+../extensions/os_mac/during_start_prep.sh

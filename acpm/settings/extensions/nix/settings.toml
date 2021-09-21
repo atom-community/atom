@@ -1,0 +1,5 @@
+defaultFrom = "8917ffe7232e1e9db23ec9405248fd1944d0b36f" # this is a commit hash on the nixpkgs repo on github
+
+[config]
+allowUnfree = true
+permittedInsecurePackages = [ "openssl-1.0.2u",]

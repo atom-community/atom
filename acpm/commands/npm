@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# summary
+    # this is a wrapper to trick everything into using pnpm instead of npm
+if [ "$1" = "install" ] || [ "$1" = "i" ]
+then
+    shift 1
+    args="$@"
+    if [ -z "$args" ]
+    then
+        pnpm install
+    else
+        pnpm install --ignore-workspace-root-check "$@"
+    fi
+else
+    pnpm "$@"
+fi

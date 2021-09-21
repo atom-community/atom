@@ -1,0 +1,1 @@
+../extensions/#standard/commands/tools/fornix/ensure_all_commands_executable
