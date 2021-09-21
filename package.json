@@ -173,6 +173,7 @@
     "yargs": "16.1.0"
   },
   "packageDependencies": {
+    "prettier-config-atomic": "^2.1.0",
     "atom-dark-syntax": "file:./packages/atom-dark-syntax",
     "atom-dark-ui": "file:./packages/atom-dark-ui",
     "atom-light-syntax": "file:./packages/atom-light-syntax",
