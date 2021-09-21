@@ -7,18 +7,20 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let ContextMenuManager;
 const path = require('path');
 const CSON = require('season');
 const fs = require('fs-plus');
-const {calculateSpecificity, validateSelector} = require('clear-cut');
-const {Disposable} = require('event-kit');
-const {remote} = require('electron');
+const { calculateSpecificity, validateSelector } = require('clear-cut');
+const { Disposable } = require('event-kit');
+const { remote } = require('electron');
 const MenuHelpers = require('./menu-helpers');
-const {sortMenuItems} = require('./menu-sort-helpers');
+const { sortMenuItems } = require('./menu-sort-helpers');
 const _ = require('underscore-plus');
 
-const platformContextMenu = __guard__(__guard__(require('../package.json'), x1 => x1._atomMenu), x => x['context-menu']);
+const platformContextMenu = __guard__(
+  __guard__(require('../package.json'), x1 => x1._atomMenu),
+  x => x['context-menu']
+);
 
 // Extended: Provides a registry for commands that you'd like to appear in the
 // context menu.
@@ -50,27 +52,32 @@ const platformContextMenu = __guard__(__guard__(require('../package.json'), x1 =
 //
 // The format for use in {::add} is the same minus the `context-menu` key. See
 // {::add} for more information.
-module.exports =
-(ContextMenuManager = class ContextMenuManager {
-  constructor({keymapManager}) {
+module.exports = class ContextMenuManager {
+  constructor({ keymapManager }) {
     this.keymapManager = keymapManager;
-    this.definitions = {'.overlayer': []}; // TODO: Remove once color picker package stops touching private data
+    this.definitions = { '.overlayer': [] }; // TODO: Remove once color picker package stops touching private data
     this.clear();
 
     this.keymapManager.onDidLoadBundledKeymaps(() => this.loadPlatformItems());
   }
 
-  initialize({resourcePath, devMode}) {
+  initialize({ resourcePath, devMode }) {
     this.resourcePath = resourcePath;
     this.devMode = devMode;
   }
 
   loadPlatformItems() {
     if (platformContextMenu != null) {
-      return this.add(platformContextMenu, this.devMode != null ? this.devMode : false);
+      return this.add(
+        platformContextMenu,
+        this.devMode != null ? this.devMode : false
+      );
     } else {
       const menusDirPath = path.join(this.resourcePath, 'menus');
-      const platformMenuPath = fs.resolve(menusDirPath, process.platform, ['cson', 'json']);
+      const platformMenuPath = fs.resolve(menusDirPath, process.platform, [
+        'cson',
+        'json'
+      ]);
       const map = CSON.readFileSync(platformMenuPath);
       return this.add(map['context-menu']);
     }
@@ -131,12 +138,16 @@ module.exports =
   // added menu items.
   add(itemsBySelector, throwOnInvalidSelector) {
     let itemSet;
-    if (throwOnInvalidSelector == null) { throwOnInvalidSelector = true; }
+    if (throwOnInvalidSelector == null) {
+      throwOnInvalidSelector = true;
+    }
     const addedItemSets = [];
 
     for (let selector in itemsBySelector) {
       const items = itemsBySelector[selector];
-      if (throwOnInvalidSelector) { validateSelector(selector); }
+      if (throwOnInvalidSelector) {
+        validateSelector(selector);
+      }
       itemSet = new ContextMenuItemSet(selector, items);
       addedItemSets.push(itemSet);
       this.itemSets.push(itemSet);
@@ -150,7 +161,7 @@ module.exports =
   }
 
   templateForElement(target) {
-    return this.templateForEvent({target});
+    return this.templateForEvent({ target });
   }
 
   templateForEvent(event) {
@@ -160,14 +171,19 @@ module.exports =
     while (currentTarget != null) {
       var item;
       const currentTargetItems = [];
-      const matchingItemSets =
-        this.itemSets.filter(itemSet => currentTarget.webkitMatchesSelector(itemSet.selector));
+      const matchingItemSets = this.itemSets.filter(itemSet =>
+        currentTarget.webkitMatchesSelector(itemSet.selector)
+      );
 
       for (let itemSet of Array.from(matchingItemSets)) {
         for (item of Array.from(itemSet.items)) {
           const itemForEvent = this.cloneItemForEvent(item, event);
           if (itemForEvent) {
-            MenuHelpers.merge(currentTargetItems, itemForEvent, itemSet.specificity);
+            MenuHelpers.merge(
+              currentTargetItems,
+              itemForEvent,
+              itemSet.specificity
+            );
           }
         }
       }
@@ -193,8 +209,14 @@ module.exports =
       for (let id in template) {
         const item = template[id];
         if (item.command) {
-          const keymaps = this.keymapManager.findKeyBindings({command: item.command, target: document.activeElement});
-          const keystrokes = __guard__(keymaps != null ? keymaps[0] : undefined, x2 => x2.keystrokes);
+          const keymaps = this.keymapManager.findKeyBindings({
+            command: item.command,
+            target: document.activeElement
+          });
+          const keystrokes = __guard__(
+            keymaps != null ? keymaps[0] : undefined,
+            x2 => x2.keystrokes
+          );
           if (keystrokes) {
             // Electron does not support multi-keystroke accelerators. Therefore,
             // when the command maps to a multi-stroke key binding, show the
@@ -202,7 +224,9 @@ module.exports =
             if (keystrokes.includes(' ')) {
               item.label += ` [${_.humanizeKeystroke(keystrokes)}]`;
             } else {
-              item.accelerator = MenuHelpers.acceleratorForKeystroke(keystrokes);
+              item.accelerator = MenuHelpers.acceleratorForKeystroke(
+                keystrokes
+              );
             }
           }
         }
@@ -223,7 +247,7 @@ module.exports =
       const result = [];
       while (index < menu.length) {
         if (menu[index].type === 'separator') {
-          if (!keepNextItemIfSeparator || (index === (menu.length - 1))) {
+          if (!keepNextItemIfSeparator || index === menu.length - 1) {
             result.push(menu.splice(index, 1));
           } else {
             result.push(index++);
@@ -250,10 +274,14 @@ module.exports =
 
   // Returns an object compatible with `::add()` or `null`.
   cloneItemForEvent(item, event) {
-    if (item.devMode && !this.devMode) { return null; }
+    if (item.devMode && !this.devMode) {
+      return null;
+    }
     item = Object.create(item);
     if (typeof item.shouldDisplay === 'function') {
-      if (!item.shouldDisplay(event)) { return null; }
+      if (!item.shouldDisplay(event)) {
+        return null;
+      }
     }
     if (typeof item.created === 'function') {
       item.created(event);
@@ -270,7 +298,9 @@ module.exports =
     this.activeElement = event.target;
     const menuTemplate = this.templateForEvent(event);
 
-    if (!((menuTemplate != null ? menuTemplate.length : undefined) > 0)) { return; }
+    if (!((menuTemplate != null ? menuTemplate.length : undefined) > 0)) {
+      return;
+    }
     remote.getCurrentWindow().emit('context-menu', menuTemplate);
   }
 
@@ -278,19 +308,21 @@ module.exports =
     this.activeElement = null;
     this.itemSets = [];
     const inspectElement = {
-      'atom-workspace': [{
-        label: 'Inspect Element',
-        command: 'application:inspect',
-        devMode: true,
-        created(event) {
-          const {pageX, pageY} = event;
-          return this.commandDetail = {x: pageX, y: pageY};
+      'atom-workspace': [
+        {
+          label: 'Inspect Element',
+          command: 'application:inspect',
+          devMode: true,
+          created(event) {
+            const { pageX, pageY } = event;
+            return (this.commandDetail = { x: pageX, y: pageY });
+          }
         }
-      }]
+      ]
     };
     return this.add(inspectElement, false);
   }
-});
+};
 
 class ContextMenuItemSet {
   constructor(selector, items) {
@@ -301,5 +333,7 @@ class ContextMenuItemSet {
 }
 
 function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+  return typeof value !== 'undefined' && value !== null
+    ? transform(value)
+    : undefined;
 }

@@ -6,12 +6,10 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let OverlayManager;
 const ElementResizeDetector = require('element-resize-detector');
 let elementResizeDetector = null;
 
-module.exports =
-(OverlayManager = class OverlayManager {
+module.exports = class OverlayManager {
   constructor(presenter, container, views) {
     this.presenter = presenter;
     this.container = container;
@@ -30,7 +28,7 @@ module.exports =
     return (() => {
       const result = [];
       for (let id in this.overlaysById) {
-        const {overlayNode} = this.overlaysById[id];
+        const { overlayNode } = this.overlaysById[id];
         if (!state.content.overlays.hasOwnProperty(id)) {
           delete this.overlaysById[id];
           overlayNode.remove();
@@ -45,37 +43,69 @@ module.exports =
 
   shouldUpdateOverlay(decorationId, overlay) {
     const cachedOverlay = this.overlaysById[decorationId];
-    if (cachedOverlay == null) { return true; }
-    return ((cachedOverlay.pixelPosition != null ? cachedOverlay.pixelPosition.top : undefined) !== (overlay.pixelPosition != null ? overlay.pixelPosition.top : undefined)) ||
-      ((cachedOverlay.pixelPosition != null ? cachedOverlay.pixelPosition.left : undefined) !== (overlay.pixelPosition != null ? overlay.pixelPosition.left : undefined));
+    if (cachedOverlay == null) {
+      return true;
+    }
+    return (
+      (cachedOverlay.pixelPosition != null
+        ? cachedOverlay.pixelPosition.top
+        : undefined) !==
+        (overlay.pixelPosition != null
+          ? overlay.pixelPosition.top
+          : undefined) ||
+      (cachedOverlay.pixelPosition != null
+        ? cachedOverlay.pixelPosition.left
+        : undefined) !==
+        (overlay.pixelPosition != null ? overlay.pixelPosition.left : undefined)
+    );
   }
 
   measureOverlay(decorationId, itemView) {
     let left;
-    const contentMargin = (left = parseInt(getComputedStyle(itemView)['margin-left'])) != null ? left : 0;
-    return this.presenter.setOverlayDimensions(decorationId, itemView.offsetWidth, itemView.offsetHeight, contentMargin);
+    const contentMargin =
+      (left = parseInt(getComputedStyle(itemView)['margin-left'])) != null
+        ? left
+        : 0;
+    return this.presenter.setOverlayDimensions(
+      decorationId,
+      itemView.offsetWidth,
+      itemView.offsetHeight,
+      contentMargin
+    );
   }
 
-  renderOverlay(state, decorationId, {item, pixelPosition, class: klass}) {
+  renderOverlay(state, decorationId, { item, pixelPosition, class: klass }) {
     let overlayNode;
     const itemView = this.views.getView(item);
     let cachedOverlay = this.overlaysById[decorationId];
-    if (!(overlayNode = cachedOverlay != null ? cachedOverlay.overlayNode : undefined)) {
+    if (
+      !(overlayNode =
+        cachedOverlay != null ? cachedOverlay.overlayNode : undefined)
+    ) {
       overlayNode = document.createElement('atom-overlay');
-      if (klass != null) { overlayNode.classList.add(klass); }
-      if (elementResizeDetector == null) { elementResizeDetector = ElementResizeDetector({strategy: 'scroll'}); }
+      if (klass != null) {
+        overlayNode.classList.add(klass);
+      }
+      if (elementResizeDetector == null) {
+        elementResizeDetector = ElementResizeDetector({ strategy: 'scroll' });
+      }
       elementResizeDetector.listenTo(overlayNode, () => {
         if (overlayNode.parentElement != null) {
           return this.measureOverlay(decorationId, itemView);
         }
       });
       this.container.appendChild(overlayNode);
-      this.overlaysById[decorationId] = (cachedOverlay = {overlayNode, itemView});
+      this.overlaysById[decorationId] = cachedOverlay = {
+        overlayNode,
+        itemView
+      };
     }
 
     // The same node may be used in more than one overlay. This steals the node
     // back if it has been displayed in another overlay.
-    if (!overlayNode.contains(itemView)) { overlayNode.appendChild(itemView); }
+    if (!overlayNode.contains(itemView)) {
+      overlayNode.appendChild(itemView);
+    }
 
     cachedOverlay.pixelPosition = pixelPosition;
     overlayNode.style.top = pixelPosition.top + 'px';
@@ -83,4 +113,4 @@ module.exports =
 
     return this.measureOverlay(decorationId, itemView);
   }
-});
+};

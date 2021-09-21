@@ -10,8 +10,7 @@ const _ = require('underscore-plus');
 const StartDotRegex = /^\.?/;
 
 // Represents a single unit of text as selected by a grammar.
-module.exports =
-(Token = (function() {
+module.exports = Token = (function() {
   Token = class Token {
     static initClass() {
       this.prototype.value = null;
@@ -19,12 +18,12 @@ module.exports =
     }
 
     constructor(properties) {
-      ({value: this.value, scopes: this.scopes} = properties);
+      ({ value: this.value, scopes: this.scopes } = properties);
     }
 
     isEqual(other) {
       // TODO: scopes is deprecated. This is here for the sake of lang package tests
-      return (this.value === other.value) && _.isEqual(this.scopes, other.scopes);
+      return this.value === other.value && _.isEqual(this.scopes, other.scopes);
     }
 
     isBracket() {
@@ -41,4 +40,4 @@ module.exports =
   };
   Token.initClass();
   return Token;
-})());
+})();

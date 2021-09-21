@@ -10,7 +10,7 @@
 let Task;
 const _ = require('underscore-plus');
 const ChildProcess = require('child_process');
-const {Emitter} = require('event-kit');
+const { Emitter } = require('event-kit');
 const Grim = require('grim');
 
 // Extended: Run a node script in a separate process.
@@ -46,11 +46,9 @@ const Grim = require('grim');
 //
 //   callback()
 // ```
-module.exports =
-(Task = (function() {
+module.exports = Task = (function() {
   Task = class Task {
     static initClass() {
-  
       // Called upon task completion.
       //
       // It receives the same arguments that were passed to the task.
@@ -78,21 +76,39 @@ module.exports =
     // * `taskPath` The {String} path to the CoffeeScript/JavaScript file that
     //   exports a single {Function} to execute.
     constructor(taskPath) {
-      this.emitter = new Emitter;
+      this.emitter = new Emitter();
 
       const compileCachePath = require('./compile-cache').getCacheDirectory();
       taskPath = require.resolve(taskPath);
 
-      const env = Object.assign({}, process.env, {userAgent: navigator.userAgent});
-      this.childProcess = ChildProcess.fork(require.resolve('./task-bootstrap'), [compileCachePath, taskPath], {env, silent: true});
-
-      this.on("task:log", function() { return console.log(...arguments); });
-      this.on("task:warn", function() { return console.warn(...arguments); });
-      this.on("task:error", function() { return console.error(...arguments); });
-      this.on("task:deprecations", function(deprecations) {
-        for (let deprecation of Array.from(deprecations)) { Grim.addSerializedDeprecation(deprecation); }
+      const env = Object.assign({}, process.env, {
+        userAgent: navigator.userAgent
       });
-      this.on("task:completed", (...args) => (typeof this.callback === 'function' ? this.callback(...Array.from(args || [])) : undefined));
+      this.childProcess = ChildProcess.fork(
+        require.resolve('./task-bootstrap'),
+        [compileCachePath, taskPath],
+        { env, silent: true }
+      );
+
+      this.on('task:log', function() {
+        return console.log(...arguments);
+      });
+      this.on('task:warn', function() {
+        return console.warn(...arguments);
+      });
+      this.on('task:error', function() {
+        return console.error(...arguments);
+      });
+      this.on('task:deprecations', function(deprecations) {
+        for (let deprecation of Array.from(deprecations)) {
+          Grim.addSerializedDeprecation(deprecation);
+        }
+      });
+      this.on('task:completed', (...args) =>
+        typeof this.callback === 'function'
+          ? this.callback(...Array.from(args || []))
+          : undefined
+      );
 
       this.handleEvents();
     }
@@ -100,19 +116,25 @@ module.exports =
     // Routes messages from the child to the appropriate event.
     handleEvents() {
       this.childProcess.removeAllListeners();
-      this.childProcess.on('message', ({event, args}) => {
-        if (this.childProcess != null) { return this.emitter.emit(event, args); }
+      this.childProcess.on('message', ({ event, args }) => {
+        if (this.childProcess != null) {
+          return this.emitter.emit(event, args);
+        }
       });
 
       // Catch the errors that happened before task-bootstrap.
       if (this.childProcess.stdout != null) {
         this.childProcess.stdout.removeAllListeners();
-        this.childProcess.stdout.on('data', data => console.log(data.toString()));
+        this.childProcess.stdout.on('data', data =>
+          console.log(data.toString())
+        );
       }
 
       if (this.childProcess.stderr != null) {
         this.childProcess.stderr.removeAllListeners();
-        return this.childProcess.stderr.on('data', data => console.error(data.toString()));
+        return this.childProcess.stderr.on('data', data =>
+          console.error(data.toString())
+        );
       }
     }
 
@@ -124,8 +146,12 @@ module.exports =
     // * `args` The arguments to pass to the function exported by this task's script.
     // * `callback` (optional) A {Function} to call when the task completes.
     start(...args1) {
-      const adjustedLength = Math.max(args1.length, 1), args = args1.slice(0, adjustedLength - 1), callback = args1[adjustedLength - 1];
-      if (this.childProcess == null) { throw new Error('Cannot start terminated process'); }
+      const adjustedLength = Math.max(args1.length, 1);
+      const args = args1.slice(0, adjustedLength - 1);
+      const callback = args1[adjustedLength - 1];
+      if (this.childProcess == null) {
+        throw new Error('Cannot start terminated process');
+      }
 
       this.handleEvents();
       if (_.isFunction(callback)) {
@@ -133,7 +159,7 @@ module.exports =
       } else {
         args.push(callback);
       }
-      this.send({event: 'start', args});
+      this.send({ event: 'start', args });
       return undefined;
     }
 
@@ -158,21 +184,27 @@ module.exports =
     // * `callback` The {Function} to call when the event is emitted.
     //
     // Returns a {Disposable} that can be used to stop listening for the event.
-    on(eventName, callback) { return this.emitter.on(eventName, args => callback(...Array.from(args || []))); }
+    on(eventName, callback) {
+      return this.emitter.on(eventName, args =>
+        callback(...Array.from(args || []))
+      );
+    }
 
     once(eventName, callback) {
       let disposable;
-      return disposable = this.on(eventName, function(...args) {
+      return (disposable = this.on(eventName, function(...args) {
         disposable.dispose();
         return callback(...Array.from(args || []));
-      });
+      }));
     }
 
     // Public: Forcefully stop the running task.
     //
     // No more events are emitted once this method is called.
     terminate() {
-      if (this.childProcess == null) { return false; }
+      if (this.childProcess == null) {
+        return false;
+      }
 
       this.childProcess.removeAllListeners();
       if (this.childProcess.stdout != null) {
@@ -200,4 +232,4 @@ module.exports =
   };
   Task.initClass();
   return Task;
-})());
+})();

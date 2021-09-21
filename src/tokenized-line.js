@@ -12,42 +12,54 @@ const CommentScopeRegex = /(\b|\.)comment/;
 
 let idCounter = 1;
 
-module.exports =
-(TokenizedLine = (function() {
+module.exports = TokenizedLine = (function() {
   TokenizedLine = class TokenizedLine {
     static initClass() {
-  
-      Object.defineProperty(this.prototype, 'tokens', { get() {
-        if (this.cachedTokens) {
-          return this.cachedTokens;
-        } else {
-          const iterator = this.getTokenIterator();
-          const tokens = [];
-  
-          while (iterator.next()) {
-            tokens.push(new Token({
-              value: iterator.getText(),
-              scopes: iterator.getScopes().slice()
-            }));
+      Object.defineProperty(this.prototype, 'tokens', {
+        get() {
+          if (this.cachedTokens) {
+            return this.cachedTokens;
+          } else {
+            const iterator = this.getTokenIterator();
+            const tokens = [];
+
+            while (iterator.next()) {
+              tokens.push(
+                new Token({
+                  value: iterator.getText(),
+                  scopes: iterator.getScopes().slice()
+                })
+              );
+            }
+
+            return tokens;
           }
-  
-          return tokens;
         }
-      }
-    }
-      );
+      });
     }
     constructor(properties) {
       let tokens;
       this.id = idCounter++;
 
-      if (properties == null) { return; }
+      if (properties == null) {
+        return;
+      }
 
-      ({openScopes: this.openScopes, text: this.text, tags: this.tags, ruleStack: this.ruleStack, tokenIterator: this.tokenIterator, grammar: this.grammar, tokens} = properties);
+      ({
+        openScopes: this.openScopes,
+        text: this.text,
+        tags: this.tags,
+        ruleStack: this.ruleStack,
+        tokenIterator: this.tokenIterator,
+        grammar: this.grammar,
+        tokens
+      } = properties);
       this.cachedTokens = tokens;
     }
 
-    getTokenIterator() { return this.tokenIterator.reset(this); }
+    getTokenIterator() {
+      return this.tokenIterator.reset(this);
+    }
 
     tokenAtBufferColumn(bufferColumn) {
       return this.tokens[this.tokenIndexAtBufferColumn(bufferColumn)];
@@ -59,7 +71,9 @@ module.exports =
       for (index = 0; index < this.tokens.length; index++) {
         const token = this.tokens[index];
         column += token.value.length;
-        if (column > bufferColumn) { return index; }
+        if (column > bufferColumn) {
+          return index;
+        }
       }
       return index - 1;
     }
@@ -68,7 +82,9 @@ module.exports =
       let delta = 0;
       for (let token of Array.from(this.tokens)) {
         const nextDelta = delta + token.bufferDelta;
-        if (nextDelta > bufferColumn) { break; }
+        if (nextDelta > bufferColumn) {
+          break;
+        }
         delta = nextDelta;
       }
       return delta;
@@ -76,7 +92,9 @@ module.exports =
 
     isComment() {
       let tag;
-      if (this.isCommentLine != null) { return this.isCommentLine; }
+      if (this.isCommentLine != null) {
+        return this.isCommentLine;
+      }
 
       this.isCommentLine = false;
 
@@ -93,7 +111,9 @@ module.exports =
         // non-whitespace chunk of text, then we consider this as not being a
         // comment line.
         if (tag > 0) {
-          if (!isWhitespaceOnly(this.text.substr(startIndex, tag))) { break; }
+          if (!isWhitespaceOnly(this.text.substr(startIndex, tag))) {
+            break;
+          }
           startIndex += tag;
         }
 
@@ -107,7 +127,7 @@ module.exports =
     }
 
     isCommentOpenTag(tag) {
-      if ((tag < 0) && ((tag & 1) === 1)) {
+      if (tag < 0 && (tag & 1) === 1) {
         const scope = this.grammar.scopeForId(tag);
         if (CommentScopeRegex.test(scope)) {
           return true;
@@ -122,17 +142,21 @@ module.exports =
 
     getTokenCount() {
       let count = 0;
-      for (let tag of Array.from(this.tags)) { if (tag >= 0) { count++; } }
+      for (let tag of Array.from(this.tags)) {
+        if (tag >= 0) {
+          count++;
+        }
+      }
       return count;
     }
   };
   TokenizedLine.initClass();
   return TokenizedLine;
-})());
+})();
 
 var isWhitespaceOnly = function(text) {
   for (let char of Array.from(text)) {
-    if ((char !== '\t') && (char !== ' ')) {
+    if (char !== '\t' && char !== ' ') {
       return false;
     }
   }
