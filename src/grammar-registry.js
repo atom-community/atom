@@ -169,7 +169,7 @@ module.exports = class GrammarRegistry {
   }
 
   // Extended: Get the `languageId` that has been explicitly assigned to
-  // the given buffer, if any.
+  // to the given buffer, if any.
   //
   // Returns a {String} id of the language
   getAssignedLanguageId(buffer) {

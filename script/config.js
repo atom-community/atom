@@ -3,6 +3,7 @@
 
 'use strict';
 
+const fs = require('fs');
 const path = require('path');
 const spawnSync = require('./lib/spawn-sync');
 
@@ -124,6 +125,8 @@ function getApmBinPath() {
 }
 
 function getNpmBinPath(external = false) {
+  if (process.env.NPM_BIN_PATH) return process.env.NPM_BIN_PATH;
+
   const npmBinName = process.platform === 'win32' ? 'npm.cmd' : 'npm';
   const localNpmBinPath = path.resolve(
     repositoryRootPath,
@@ -132,5 +135,7 @@ function getNpmBinPath(external = false) {
     '.bin',
     npmBinName
   );
-  return localNpmBinPath;
+  return !external && fs.existsSync(localNpmBinPath)
+    ? localNpmBinPath
+    : npmBinName;
 }

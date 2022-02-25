@@ -14,7 +14,7 @@ describe('TextEditorElement', () => {
   });
 
   function buildTextEditorElement(options = {}) {
-    const element = TextEditorElement.createTextEditorElement();
+    const element = new TextEditorElement();
     element.setUpdatedSynchronously(false);
     if (options.attach !== false) jasmine.attachToDOM(element);
     return element;

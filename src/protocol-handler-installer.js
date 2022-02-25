@@ -1,4 +1,4 @@
-const { ipcRenderer } = require('electron');
+const { remote } = require('electron');
 
 const SETTING = 'core.uriHandlerRegistration';
 const PROMPT = 'prompt';
@@ -10,28 +10,26 @@ module.exports = class ProtocolHandlerInstaller {
     return ['win32', 'darwin'].includes(process.platform);
   }
 
-  async isDefaultProtocolClient() {
-    return ipcRenderer.invoke('isDefaultProtocolClient', {
-      protocol: 'atom',
-      path: process.execPath,
-      args: ['--uri-handler', '--']
-    });
+  isDefaultProtocolClient() {
+    return remote.app.isDefaultProtocolClient('atom', process.execPath, [
+      '--uri-handler',
+      '--'
+    ]);
   }
 
-  async setAsDefaultProtocolClient() {
+  setAsDefaultProtocolClient() {
     // This Electron API is only available on Windows and macOS. There might be some
     // hacks to make it work on Linux; see https://github.com/electron/electron/issues/6440
     return (
       this.isSupported() &&
-      ipcRenderer.invoke('setAsDefaultProtocolClient', {
-        protocol: 'atom',
-        path: process.execPath,
-        args: ['--uri-handler', '--']
-      })
+      remote.app.setAsDefaultProtocolClient('atom', process.execPath, [
+        '--uri-handler',
+        '--'
+      ])
     );
   }
 
-  async initialize(config, notifications) {
+  initialize(config, notifications) {
     if (!this.isSupported()) {
       return;
     }
@@ -39,12 +37,12 @@ module.exports = class ProtocolHandlerInstaller {
     const behaviorWhenNotProtocolClient = config.get(SETTING);
     switch (behaviorWhenNotProtocolClient) {
       case PROMPT:
-        if (await !this.isDefaultProtocolClient()) {
+        if (!this.isDefaultProtocolClient()) {
           this.promptToBecomeProtocolClient(config, notifications);
         }
         break;
       case ALWAYS:
-        if (await !this.isDefaultProtocolClient()) {
+        if (!this.isDefaultProtocolClient()) {
           this.setAsDefaultProtocolClient();
         }
         break;

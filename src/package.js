@@ -917,10 +917,6 @@ module.exports = class Package {
             this.getCanDeferMainModuleRequireStorageKey(),
             'true'
           );
-        } else {
-          localStorage.removeItem(
-            this.getCanDeferMainModuleRequireStorageKey()
-          );
         }
         return this.mainModule;
       }

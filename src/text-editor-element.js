@@ -29,8 +29,7 @@ class TextEditorElement extends HTMLElement {
     return this;
   }
 
-  constructor() {
-    super();
+  createdCallback() {
     this.emitter = new Emitter();
     this.initialText = this.textContent;
     if (this.tabIndex == null) this.tabIndex = -1;
@@ -40,18 +39,14 @@ class TextEditorElement extends HTMLElement {
     this.addEventListener('blur', event => this.getComponent().didBlur(event));
   }
 
-  connectedCallback() {
+  attachedCallback() {
     this.getComponent().didAttach();
     this.emitter.emit('did-attach');
   }
 
-  disconnectedCallback() {
+  detachedCallback() {
     this.emitter.emit('did-detach');
     this.getComponent().didDetach();
-  }
-
-  static get observedAttributes() {
-    return ['mini', 'placeholder-text', 'gutter-hidden', 'readonly'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -357,12 +352,8 @@ class TextEditorElement extends HTMLElement {
   getFirstVisibleScreenColumn() {
     return this.getModel().getFirstVisibleScreenColumn();
   }
-
-  static createTextEditorElement() {
-    return document.createElement('atom-text-editor');
-  }
 }
 
-window.customElements.define('atom-text-editor', TextEditorElement);
-
-module.exports = TextEditorElement;
+module.exports = document.registerElement('atom-text-editor', {
+  prototype: TextEditorElement.prototype
+});
