@@ -22,9 +22,7 @@ class StylesElement extends HTMLElement {
   }
 
   connectedCallback() {
-    let left;
-    this.context =
-      (left = this.getAttribute('context')) != null ? left : undefined;
+    this.context = this.getAttribute('context') ?? undefined;
   }
 
   disconnectedCallback() {
@@ -70,7 +68,7 @@ class StylesElement extends HTMLElement {
       return;
     }
 
-    for (let child of Array.from(Array.prototype.slice.call(this.children))) {
+    for (let child of Array.prototype.slice.call(this.children)) {
       this.styleElementRemoved(child);
     }
     this.context = this.getAttribute('context');
@@ -109,16 +107,13 @@ class StylesElement extends HTMLElement {
   }
 
   styleElementRemoved(styleElement) {
-    let left;
     if (!this.styleElementMatchesContext(styleElement)) {
       return;
     }
 
-    const styleElementClone =
-      (left = this.styleElementClonesByOriginalElement.get(styleElement)) !=
-      null
-        ? left
-        : styleElement;
+    const styleElementClone = this.styleElementClonesByOriginalElement.get(
+      styleElement
+    ) ?? styleElement;
     styleElementClone.remove();
     this.emitter.emit('did-remove-style-element', styleElementClone);
   }
