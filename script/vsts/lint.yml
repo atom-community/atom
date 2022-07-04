@@ -4,6 +4,9 @@ jobs:
     pool:
       vmImage: ubuntu-latest
     steps:
+      - script: npm install --global npm@7
+        displayName: Update npm
+
       - script: |
           cd script
           npm ci

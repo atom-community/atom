@@ -64,6 +64,7 @@ module.exports = {
   getApmBinPath,
   getNpmBinPath,
   getLocalNpmBinPath,
+  getPnpmBinPath,
   snapshotAuxiliaryData: {},
   REPO_OWNER,
   MAIN_REPO,
@@ -126,6 +127,10 @@ function getApmBinPath() {
 
 function getNpmBinPath() {
   return process.platform === 'win32' ? 'npm.cmd' : 'npm';
+}
+
+function getPnpmBinPath() {
+  return process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 }
 
 function getLocalNpmBinPath() {
