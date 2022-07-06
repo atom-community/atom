@@ -190,8 +190,8 @@ module.exports = class PackageManager {
   // Return a {String} file path to apm.
   getApmPath() {
     const configPath = atom.config.get('core.apmPath');
-    if (configPath || this.apmPath) {
-      return configPath || this.apmPath;
+    if (process.env.APM_PATH || configPath || this.apmPath) {
+      return process.env.APM_PATH || configPath || this.apmPath;
     }
 
     const commandName = process.platform === 'win32' ? 'apm.cmd' : 'apm';
