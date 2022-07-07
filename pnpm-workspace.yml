@@ -1,0 +1,4 @@
+packages:
+  - "."
+# There is nothing, however it may be used in
+# the program itself.
