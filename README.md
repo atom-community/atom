@@ -13,7 +13,6 @@
 
 # Atom Community
 
-[![Button Install]][Install]   
 [![Button Documentation]][Documentation]   
 [![Button Build]][Build] 
 
@@ -51,7 +50,6 @@
 <!---------------------------{ Files }--------------------------->
 
 [Documentation]: docs/Documentation.md 'Information how to use & work with Atom.'
-[Install]: docs/Installation.md 'How to install Atom on your system.'
 [Retired]: docs/Retirement.md 'Check out what happened to the original Atom project.'
 [License]: LICENSE.md
 [Build]: docs/Building.md 'Instructions on how to build Atom by yourself.'
@@ -76,6 +74,5 @@
 <!--------------------------{ Buttons }--------------------------->
 
 [Button Documentation]: https://img.shields.io/badge/Documentation-6399c4?style=for-the-badge&logoColor=white&logo=GitBook
-[Button Install]: https://img.shields.io/badge/Install-78af9f?style=for-the-badge&logoColor=white&logo=DocuSign
 [Button Build]: https://img.shields.io/badge/Building-e5ab42?style=for-the-badge&logoColor=white&logo=GNUBash
 
