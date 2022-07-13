@@ -5,16 +5,16 @@
 <br>
 <br>
 
+[![Badge License]][License]    
+[![Badge Guidelines]][Guidelines]    
+[![Badge Sunset]][Retired]    
+[![Badge Discord]][Discord]
+
 # Atom Community
 
 [![Button Install]][Install]   
 [![Button Documentation]][Documentation]   
 [![Button Build]][Build] 
-
-[![Badge License]][License]    
-[![Badge Guidelines]][Guidelines]    
-[![Badge Sunset]][Retired]    
-[![Badge Discord]][Discord]
 
 <br>
  
