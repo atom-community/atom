@@ -1,5 +1,5 @@
 # Specs depend on character counts, if we don't specify the line endings the
-# fixtures will vary depending on platform
+# fixtures will vary depending on platform.
 spec/fixtures/**/*.js text eol=lf
 spec/fixtures/**/*.coffee text eol=lf
 spec/fixtures/**/*.less text eol=lf
@@ -7,16 +7,16 @@ spec/fixtures/**/*.css text eol=lf
 spec/fixtures/**/*.txt text eol=lf
 spec/fixtures/dir/**/* text eol=lf
 
-# Git 1.7 does not support **/* patterns
+# Git 1.7 does not support **/* patterns.
 spec/fixtures/css.css text eol=lf
 spec/fixtures/sample.js text eol=lf
 spec/fixtures/sample.less text eol=lf
 spec/fixtures/sample.txt text eol=lf
 
-# Windows bash scripts are also Unix LF endings
+# Windows bash scripts are also Unix LF endings.
 *.sh		eol=lf
 
-# The script executables should be LF so they can be edited on Windows
+# The script executables should be LF so they can be edited on Windows.
 script/bootstrap text eol=lf
 script/build text eol=lf
 script/cibuild text eol=lf
