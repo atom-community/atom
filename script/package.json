@@ -34,7 +34,7 @@
     "lodash.template": "4.5.0",
     "minidump": "^0.22.0",
     "mkdirp": "0.5.1",
-    "nock": "^13.0.2",
+    "nock": "^13.3.0",
     "node-fetch": "^2.6.7",
     "normalize-package-data": "2.3.5",
     "npm": "^6.14.16",
