@@ -6,6 +6,46 @@ const terser = require('terser');
 const CONFIG = require('../config');
 
 module.exports = function(packagedAppPath) {
+  console.log('Bundling with Parcel');
+  const parcel = childProcess.spawnSync(
+    process.execPath,
+    [
+      path.join(
+        CONFIG.repositoryRootPath,
+        'script',
+        'node_modules',
+        'parcel',
+        'lib',
+        'bin.js'
+      ),
+      'build',
+      CONFIG.repositoryRootPath,
+      '--detailed-report'
+    ],
+    { stdio: 'inherit' }
+  );
+  if (parcel.stderr) {
+    console.error(parcel.stderr);
+  }
+  // replace bundles with the source
+  [
+    path.join(CONFIG.intermediateAppPath, 'src/main-process/main.bundle.js'),
+    path.join(CONFIG.intermediateAppPath, 'src/main-process/start.bundle.js'),
+    path.join(
+      CONFIG.intermediateAppPath,
+      'src/main-process/atom-application.bundle.js'
+    ),
+    path.join(
+      CONFIG.intermediateAppPath,
+      'src/initialize-application-window.bundle.js'
+    )
+  ].map(bundleFile => {
+    const sourceFile = bundleFile.replace('.bundle.js', '.js');
+    fs.unlinkSync(sourceFile);
+    fs.renameSync(bundleFile, sourceFile);
+    fs.renameSync(bundleFile + '.map', sourceFile + '.map');
+  });
+
   const snapshotScriptPath = path.join(CONFIG.buildOutputPath, 'startup.js');
   const coreModules = new Set([
     'electron',
@@ -47,6 +87,7 @@ module.exports = function(packagedAppPath) {
       return (
         requiredModulePath.endsWith('.node') ||
         coreModules.has(requiredModulePath) ||
+        requiringModuleRelativePath.includes('node_modules') || // exclude node_modules
         requiringModuleRelativePath.endsWith(
           path.join('node_modules/xregexp/xregexp-all.js')
         ) ||

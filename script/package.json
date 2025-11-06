@@ -2,6 +2,8 @@
   "name": "atom-build-scripts",
   "description": "Atom build scripts",
   "dependencies": {
+    "@parcel/transformer-coffeescript": "2.6.2",
+    "parcel": "2.6.2",
     "7zip-bin": "^4.0.2",
     "@atom/electron-winstaller": "0.0.1",
     "@octokit/request": "^5.4.5",

@@ -8,7 +8,6 @@ StartupTime.setStartTime();
 
 const path = require('path');
 const fs = require('fs-plus');
-const CSON = require('season');
 const yargs = require('yargs');
 const { app } = require('electron');
 
@@ -24,7 +23,7 @@ function isAtomRepoPath(repoPath) {
   let packageJsonPath = path.join(repoPath, 'package.json');
   if (fs.statSyncNoException(packageJsonPath)) {
     try {
-      let packageJson = CSON.readFileSync(packageJsonPath);
+      let packageJson = require(packageJsonPath);
       return packageJson.name === 'atom';
     } catch (e) {
       return false;

@@ -273,6 +273,111 @@
     "preinstall": "node -e 'process.exit(0)'",
     "test": "node script/test"
   },
+  "engines": {
+    "electron": "9.4.4"
+  },
+  "main-target": "./out/app/src/main-process/main.bundle.js",
+  "start-target": "./out/app/src/main-process/start.bundle.js",
+  "application-target": "./out/app/src/main-process/atom-application.bundle.js",
+  "initialize-target": "./out/app/src/initialize-application-window.bundle.js",
+  "targets": {
+    "main-target": {
+      "source": "./out/app/src/main-process/main.js",
+      "context": "electron-main",
+      "includeNodeModules": {
+        "electron": false,
+        "y18n": false
+      }
+    },
+    "start-target": {
+      "source": "./out/app/src/main-process/start.js",
+      "context": "electron-main",
+      "includeNodeModules": {
+        "electron": false,
+        "nslog": false,
+        "y18n": false,
+        "coffee-script": false
+      }
+    },
+    "application-target": {
+      "source": "./out/app/src/main-process/atom-application.js",
+      "context": "electron-renderer",
+      "includeNodeModules": {
+        "electron": false,
+        "atom": false,
+        "pathwatcher": false,
+        "@atom/nsfw": false,
+        "@atom/watcher": false,
+        "fs-admin": false,
+        "git-utils": false,
+        "oniguruma": false,
+        "superstring": false,
+        "coffee-script": false
+      }
+    },
+    "initialize-target": {
+      "source": "./out/app/src/initialize-application-window.js",
+      "context": "electron-renderer",
+      "includeNodeModules": {
+        "electron": false,
+        "atom": false,
+        "pathwatcher": false,
+        "@atom/nsfw": false,
+        "@atom/watcher": false,
+        "fs-admin": false,
+        "git-utils": false,
+        "oniguruma": false,
+        "superstring": false,
+        "keybinding-resolver": false,
+        "keytar": false,
+        "loophole": false,
+        "pegjs": false,
+        "@atom/fuzzy-native": false,
+        "scrollbar-style": false,
+        "spellchecker": false,
+        "ctags": false,
+        "keyboard-layout": false,
+        "open-on-github": false,
+        "babel-core": false,
+        "natural": false,
+        "xregexp": false,
+        "dugite": false,
+        "yaml-front-matter": false,
+        "cheerio": false,
+        "marked": false,
+        "typescript-simple": false,
+        "typescript": false,
+        "coffee-script": false,
+        "fs-extra": false,
+        "graceful-fs": false,
+        "htmlparser2": false,
+        "minimatch": false,
+        "request": false,
+        "temp": false,
+        "parse5": false,
+        "atom-keymap": false,
+        "debug": false,
+        "glob": false,
+        "iconv-lite": false,
+        "less": false,
+        "less-node": false,
+        "lodash.isequal": false,
+        "node-fetch": false,
+        "resolve": false,
+        "tar": false,
+        "tmp": false,
+        "tree_sitter": false,
+        "yauzl": false,
+        "util-deprecate": false,
+        "winreg": false,
+        "scandal": false,
+        "vscode-ripgrep": false
+      }
+    }
+  },
+  "alias": {
+    "react-dom": "react-dom/cjs/react-dom.production.min.js"
+  },
   "standard-engine": "./script/node_modules/standard",
   "standard": {
     "env": {
