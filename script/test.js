@@ -34,7 +34,7 @@ const argv = require('yargs')
   .help().argv;
 
 const assert = require('assert');
-const asyncSeries = require('async/series');
+const asyncParallelLimit = require('async/parallelLimit');
 const childProcess = require('child_process');
 const fs = require('fs-extra');
 const glob = require('glob');
@@ -476,7 +476,7 @@ function requestedTestSuites(platform) {
   return suites;
 }
 
-asyncSeries(testSuitesToRun, function(err, results) {
+function testsFailureCallback(err, results) {
   if (err) {
     console.error(err);
     process.exit(1);
@@ -497,4 +497,6 @@ asyncSeries(testSuitesToRun, function(err, results) {
 
     process.exit(0);
   }
-});
+}
+
+asyncParallelLimit(testSuitesToRun, 2, testsFailureCallback);
