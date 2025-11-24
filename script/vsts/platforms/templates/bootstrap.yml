@@ -24,3 +24,13 @@ steps:
       CI: true
       CI_PROVIDER: VSTS
     condition: or(ne(variables['MainNodeModulesRestored'], 'true'), ne(variables['ScriptRunnerNodeModulesRestored'], true), ne(variables['ScriptNodeModulesRestored'], 'true'), ne(variables['ApmNodeModulesRestored'], 'true'), ne(variables['LocalPackagesRestored'], 'true'))
+
+  # upload bootstraped repository
+  # to provide a ready development environment (similar to a pre-built docker image)
+  - template: ./zip-upload.yml
+    parameters:
+      artifacts:
+        - path: '.'
+          condition: and(succeeded(), eq(variables.IsBuild, 'true'))
+          archiveFileName: bootstrapped_repository_$(Agent.OS)_$(BUILD_ARCH).7z
+          archiveDir: $(Build.ArtifactStagingDirectory)
